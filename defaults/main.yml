@@ -1,2 +1,9 @@
 ---
-# defaults file for mmartinello.zfs_arc
+# ZFS Arc min size (in byes)
+zfs_arc_min: "{{ 1073741824 -1 | int }}"
+
+# ZFS Arc max size (in byes)
+zfs_arc_max: 1073741824
+
+# Name of the modprobe configuration file
+zfs_arc_modprobe_file_name: zfs_arc.conf
