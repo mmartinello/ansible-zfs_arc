@@ -1,2 +1,57 @@
 ---
-# tasks file for mmartinello.zfs_arc
+- name: Set ZFS module configuration file
+  ansible.builtin.template:
+    src: modprobe-zfs_arc.conf.j2
+    dest: "/etc/modprobe.d/{{ zfs_arc_modprobe_file_name }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Update initramfs
+
+- name: Get current ZFS ARC min size
+  ansible.builtin.command: cat /sys/module/zfs/parameters/zfs_arc_min
+  register: current_zfs_arc_min
+  changed_when: current_zfs_arc_min.rc == 0
+
+- name: Debug current_zfs_arc_min.stdout
+  ansible.builtin.debug:
+    msg: "{{ current_zfs_arc_min.stdout | int }}"
+
+- name: Debug zfs_arc_min
+  ansible.builtin.debug:
+    msg: "{{ zfs_arc_min | int }}"
+
+- name: Set ZFS ARC min size
+  ansible.builtin.template:
+    src: zfs_arc_min.j2
+    dest: /sys/module/zfs/parameters/zfs_arc_min
+    owner: root
+    group: root
+    mode: '0644'
+    unsafe_writes: true
+  when: current_zfs_arc_min.stdout | int != zfs_arc_min | int
+  notify: Update initramfs
+
+- name: Get current ZFS ARC max size
+  ansible.builtin.command: cat /sys/module/zfs/parameters/zfs_arc_max
+  register: current_zfs_arc_max
+  changed_when: current_zfs_arc_max.rc == 0
+
+- name: Debug current_zfs_arc_max.stdout
+  ansible.builtin.debug:
+    msg: "{{ current_zfs_arc_max.stdout | int }}"
+
+- name: Debug zfs_arc_max
+  ansible.builtin.debug:
+    msg: "{{ zfs_arc_max | int }}"
+
+- name: Set ZFS ARC max size
+  ansible.builtin.template:
+    src: zfs_arc_max.j2
+    dest: /sys/module/zfs/parameters/zfs_arc_max
+    owner: root
+    group: root
+    mode: '0644'
+    unsafe_writes: true
+  when: current_zfs_arc_max.stdout | int != zfs_arc_max | int
+  notify: Update initramfs
