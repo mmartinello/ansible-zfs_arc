@@ -1,0 +1,24 @@
+---
+- name: Check if the zfs command is available
+  ansible.builtin.stat:
+    path: /usr/sbin/zfs
+  register: zfs_command
+
+- name: This role can run only on ZFS enabled systems
+  ansible.builtin.fail:
+    msg: This role run only on ZFS enabled systems (/usr/bin/zfs command does not exist)
+  when: not zfs_command.stat.exists or not zfs_command.stat.executable
+
+- name: ZFS ARC min limit has to be less than the max one
+  ansible.builtin.fail:
+    msg: "zfs_arc_min size ({{ zfs_arc_min }}) has to be less than the zfs_arc_max one ({{ zfs_arc_max }})"
+  when: not zfs_arc_min | int < zfs_arc_max | int
+
+- name: ZFS ARC max limit has not to be too high
+  ansible.builtin.fail:
+    msg: >-
+      The configured ZFS ARC max limit ({{ zfs_arc_max | int }}) is too high compared to the system RAM size.
+      Configured ZFS ARC max limit: {{ zfs_arc_max | int / 1024 / 1024 }} Mb
+      System RAM size: {{ ansible_memtotal_mb | int }}
+      Maximum accepted ZFS ARC max limit: {{ zfs_arc_max_limit | int }} Mb
+  when: not zfs_arc_max | int / 1024 / 1024 < zfs_arc_max_limit | int
