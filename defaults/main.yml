@@ -1,9 +1,12 @@
 ---
-# ZFS Arc min size (in byes)
-zfs_arc_min: "{{ 1073741824 -1 | int }}"
-
 # ZFS Arc max size (in byes)
 zfs_arc_max: 1073741824
 
+# ZFS Arc min size (in byes)
+zfs_arc_min: "{{ zfs_arc_max -1 | int }}"
+
 # Name of the modprobe configuration file
 zfs_arc_modprobe_file_name: zfs_arc.conf
+
+# ZFS Arc max size percent limit on RAM size
+zfs_arc_ram_percent_max_limit: 10

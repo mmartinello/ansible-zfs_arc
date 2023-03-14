@@ -1,2 +1,2 @@
 ---
-# vars file for mmartinello.zfs_arc
+zfs_arc_max_limit: "{{ ansible_memtotal_mb / 100 * zfs_arc_ram_percent_max_limit }}"
